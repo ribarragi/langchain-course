@@ -1,0 +1,48 @@
+Agent versus RAG (Retrieval Augmentation Generation) application
+
+RAG: 
+- No real decision making or autonomy 
+- Retrieves documents, feeds into LLM to generate answer
+- Good for: Q&A, search, knowledge assistants
+
+Agent:
+- LLM with tools and reasoning loop
+- Can take actions (call APIs, write code, search, plan steps), can decide when to retrieve, calculate or act.
+- Good for: workflows, automation, problem-solving
+
+
+RAG = passive + single-step (retrieve → answer)
+Agent = active + multi-step (plan → act → observe → repeat)
+
+Agents often use RAG as one of their tools
+
+RAG = asking a librarian for info
+Agent = hiring a research assistant who can search, analyze, email, and make decisions
+
+Langchain: It’s a framework for building LLM-powered apps—especially ones that go beyond a single prompt
+
+Instead of just calling a model once, LangChain helps you connect multiple steps together:
+- call an LLM
+- retrieve data (RAG)
+- use tools (APIs, code, DBs)
+- keep memory
+- loop with reasoning (agents)
+
+Lancgchain: most used application to develop RAG or agent apps
+- Use LLM
+- Use your own data model was not trained on
+- Save history of messages between user and AI
+- Connect to a tool
+- Connect to other LLM (or other agent)
+Same interface for all LLM vendors
+
+Prompts: Another module in Lancgchain, helps with:
+- Prompt management
+- Prompt Optimization
+- Prompt serializaiton
+Can create template for a prompt and add user input into it, making it an instance of the prompt template, and that final prompt
+is sent to the LLM
+
+Has also ocument loaders: to load data sources.
+
+Add tools to agent.
