@@ -35,3 +35,27 @@ PromptTemplate  →  ChatOpenAI
     link 1             link 2
 
 Prompt → LLM → output parser → another prompt → another LLM → final answer
+
+In the repsonse to my first model, the LLM introduced information other than what I gave it.
+One solution would be to improve the prompt: Do not use any other information other than the one provided in prompt.
+Also, per Claude: In production agentic apps you'd typically combine this with RAG (Retrieval Augmented Generation) 
+— where instead of relying on the model's memory, you explicitly feed it only the documents/context it's allowed 
+to use. You'll likely cover this later in the course.
+
+Using the debugger we can see the eleents of the response (red dot response and run debugger)
+The type of repsonse is an AIMessage, it contains the answer but also the tokens used, an id, model used, 
+finish reason for the LLM, ...
+
+
+Configure Langchain Smith
+Used for observability and debugging for LLM applications.
+"Each request generates a trace, which captures the full record of what happened. Within a trace are individual runs, 
+the specific operations your application performed, such as an LLM call or a retrieval step. Tracing runs allows 
+you to inspect, debug, and validate your application’s behavior."
+
+pip install -U langchain langchain-openai
+For the integraton, just add a few things into the .env file.
+
+Setting that up and then going to my account in:
+https://smith.langchain.com
+I can see the actual prompt passed to chagpt, the tokens, the cost, start time, end time, etc.
