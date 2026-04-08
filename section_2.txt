@@ -1,1 +1,37 @@
 Prompt template
+
+We may want to take prompt and give it parameters, to get different output.
+
+Langchain has prompt templates: help format things 
+into strings to be sent into LLMs.
+
+Chatmodel object will often be our primary interface for interacting 
+with LLM, its a standard way that Langchain provides to talk to LLMs
+
+The input will be a list of structured messages like a system instruction, user questions 
+or AI repsonse and the output will be an AI message.
+
+Chatmodels have a lot of capabilities.
+
+Langchain chain is a workflow that conencts multiple components chained together in a sequence
+The outut of one step becomes the input of the next one. Each step can be an LLM call, a prompt template,
+tool call, data transformation, another chain... allows to build complex stuff
+
+We copied nformation into the function from a real person and we want it to propagate to the LLM via the prompt template
+that I provided in the function too. We can do it programatically with the prompt template object
+of langchain.
+
+The whole process looks like this:
+information (raw text)
+        ↓
+PromptTemplate (formats the prompt)
+        ↓
+ChatOpenAI (sends to GPT-4o-mini)
+        ↓
+response (summary + facts)
+
+Its a chain:
+PromptTemplate  →  ChatOpenAI
+    link 1             link 2
+
+Prompt → LLM → output parser → another prompt → another LLM → final answer
