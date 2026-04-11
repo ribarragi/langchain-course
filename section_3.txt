@@ -1,0 +1,25 @@
+What are AI agents
+Uses LLMs as a reasoning element to decide what actions to take and then executes those actions
+Agents dynamically determine steps to take or tools to use to response specific questions
+The LLM is deciding whats to be done next
+
+ReAct Agent architecture
+
+Need tools: abilties we give the LLM
+Iterative loop of thinking - action - tool - observtion - thinking until task is completed
+
+This section: use langchain agents to provide access to internet
+
+We have the create_agent() function. This helps to create modern agents in langchain.
+
+Use tavily to connect agent to the web
+
+Tools:
+Function that an agent can execute, any function we want.
+We write the internal implementation of the function.
+The easiest way is to use the @tool decorator and template in langchain documentation: docstrings, typestrings, ...
+Note that the typestrings, argument names, docstrings of function are VERY important: under the hood, the LLM uses these argument and descriptions
+to decide to call or not the tools
+
+
+

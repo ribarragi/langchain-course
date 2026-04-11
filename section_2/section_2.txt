@@ -58,4 +58,4 @@ For the integraton, just add a few things into the .env file.
 
 Setting that up and then going to my account in:
 https://smith.langchain.com
-I can see the actual prompt passed to chagpt, the tokens, the cost, start time, end time, etc.
+I can see the actual prompt passed to chagpt, the tokens, the cost, start time, end time, latency, etc.
