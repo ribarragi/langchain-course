@@ -35,4 +35,28 @@ Also interesting to usethe debugger and se eeach step:
 2. ToolMessage: search
 3. AIMessage: cant connect to internet :(
 
-Best practice in langchain:
+Best practice in langchain: use their search built in tool
+
+Structured output
+If we want to take the output and downstream it into an app, we need structured output which will
+probably be a JSOJN object or a pydantic object
+We can use the create_agent function, its response_format abnd provide the schema we want and the response of the agent will adhere
+to the selected schema. see main_3_3.py
+The whole point of AgentResponse with Pydantic is that instead of parsing a raw messy string, you get clean, 
+predictable fields you can reliably pass around your application. That's what makes it production-ready.
+
+More about structured output:
+We can use in the create_agent function, but there are a bunch of implementations to structured output. Using structured outout pass 2 implementations.
+These are two different ways LangChain can force the LLM to return structured output.
+1. ToolStrategy. 
+The LLM is given your AgentResponse schema as if it were a tool to call. So instead of writing a free-form answer, 
+the model "calls" the schema like a function, filling in the fields.
+
+2. ProviderStrategy
+Uses the LLM provider's native JSON mode — you tell OpenAI directly "respond only in this JSON format" and it enforces it at the API level.
+
+Which one gets used?
+LangChain picks automatically based on your model. Since you're using ChatOpenAI, 
+it'll likely use ToolStrategy by default because OpenAI has strong tool-calling support.
+
+Because the response is a structured Pydantic object, you can cleanly pass it back into another LLM call. For example in a multi-agent pipeline:
