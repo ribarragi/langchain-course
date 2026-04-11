@@ -12,8 +12,8 @@ from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
-load_dotenv()
-# load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+# load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
 # Lets start by defininf a search tool:
 @tool

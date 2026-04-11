@@ -21,5 +21,17 @@ The easiest way is to use the @tool decorator and template in langchain document
 Note that the typestrings, argument names, docstrings of function are VERY important: under the hood, the LLM uses these argument and descriptions
 to decide to call or not the tools
 
+main_3.py has a very very simple function that is calling chatgpt and not doing much but gives a good idea if each
+and when and how the llm is called and what for.
+In this case the LLM decided which tool to use and which arguments.
+And we have an agent who runs this stuff.
+Remember we can always go to smith.langchain.com to see the traces of the calls.
+You can see in the trace the tools the input, the putput, the model...
 
+
+Also interesting to usethe debugger and se eeach step:
+0. HumanMessage: whats the weather in tokyo
+1. AIMessage: call this tool
+2. ToolMessage: search
+3. AIMessage: cant connect to internet :(
 
