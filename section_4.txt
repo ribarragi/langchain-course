@@ -1,0 +1,38 @@
+Learn how agents work under the hood
+Layer 0: langchain doing everything:
+  llm = ChatOpenAI(model = 'gpt-5')
+  tools = [TavilySearch]
+  agent = create_agent(model=llm, tools=tools)
+
+Layer 1:
+Agent loop: loop that runs continuously until agent has finished job:
+Query -> LOOP: Thought -> Tool -> Thought ... -> Answer
+This part is agent loop + function calling (langchain): @tool, bind_tools(), init_chat_model(), ToolMessage
+
+This guy will also implement it the raw way, without lancgchain
+agent loop + function calling: hand-written JSON schema, allama.chat()
+
+Layer 2: Implement agent from scrath even without function calling --> To ebtter understand how agents work.
+agent loop + raw react prompt: react prompt, regex, scratchpad
+
+Project: Develop an agent for ecommerce store running three tier discounts. The agent should take wuery from user and
+resturn price for item with discount.
+Two tools:
+1. Get item price
+2. Get discounted amount for corresponding tier
+
+Theory of ReAct (the agent loop)
+First user query to the agent
+Agent processes and returns answer
+
+First step of agent: decide what tool to use or return answer: Thought (LLM thinking after we send it the query and all the tools and information
+that the agent has at its disposal). The output is the next thing to execute: the tool call or an answer if it already has enough information.
+LLM decides what tool to use: uses function features.
+We then take the agents decision and execute that action, that will happen in our application: LLM will give us Whattool to use and with what areguments,
+we take that and run it in our agent application.
+The result of the tool is referred to as Observation.
+Now we take feed all back to the llm, the outut and the history (Trackpad). The agent has the query, the info about the product price. So in the 
+second iteration of the LLM, it knows that it must now apply a different tool. So we execute that decision in out application and we get 
+another Observation.
+In the third iteration of the agent, we send the LLM the query, the first output, the second output, what tools it executed, the whole history, Sothe agent has enough
+information to decide not to use another tool, but to provide the answer. 
