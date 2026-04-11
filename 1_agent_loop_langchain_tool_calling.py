@@ -1,84 +1,65 @@
-# This part is to load the API key
-# To access the environment variable
-import os
-from typing import List
-
+# from _typeshed import OpenBinaryMode
 from dotenv import load_dotenv
-from langchain.agents import create_agent
-from langchain.tools import tool
-from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field
-# Pydantic is a library for defining structured data schemas. Instead of the agent returning a messy
-# string, you can force it to return a proper object with specific fields. 
-# Field lets you add a description to each field, which the LLM reads to understand what 
-# to put there.
-from pydantic import BaseModel, Field
-
-# add tavily for the internet connection
-from tavily import TavilyClient
-
-# Chat model and wrapper over the OpenAI API
-# from langchain_openai import ChatOpenAI
-# from langchain_core.prompts import PromptTemplate
-
-
+import os
 # load_dotenv()
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
-from langchain_tavily import TavilySearch
 
 
+# from langchain.chat_models import init_chat_model. This is a more flexible way to initialize any 
+# chat model — OpenAI, Ollama, Anthropic, etc. — without importing 
+# each one separately. You just pass the model name as a string and LangChain figures out the rest. 
+# That's why MODEL = "qwen3:1.7b" works here instead of needing ChatOpenAI() specifically.
+from langchain.chat_models import init_chat_model
+from langchain.tools import tool
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
-# need to describe the sources that the agent uses to get the answers
-# Source inherits from oydantic BaseModel
-# we want our agent not to response a string but an agent response object that 
-# we can use downstream into an application
-# Defines what a "source" looks like — just a URL. The LLM will populate 
-# this with the actual web pages it used to find the answer.
-class Source(BaseModel):
-    """Schema for a source used by the agent"""
-    url: str = Field(description= "The URL of the source")
+# ToolNessage: a message containing the tool result
+# SystemMessage: a wrapepr to implicate that we are using a systemmessage to the LLM
+# HumanMessage: when we use user input
 
-# This is the shape of the full response you want back. Instead of a raw string you get a structured object with:
-# answer — the actual reply
-# sources — a list of URLs the agent used
-# default_factory=list just means "if no sources, default to an empty list."
-class AgentResponse(BaseModel):
-    """Schema for the agent response"""
+# SystemMessage — sets the behavior and personality of the LLM before the conversation starts. Things like "you are a helpful shopping assistant"
+# ToolMessage — wraps the result of a tool call so the LLM can receive it as part of the conversation history
 
-    answer: str = Field(description="The agent's answer to the query")
-    sources: List[Source] = Field(default_factory=list, description="List of sources used to generate answer")
+# To limit agent execution runs
+MAX_ITERATIONS = 10 
+MODEL = "qwen3:1.7b"
 
-llm = ChatOpenAI()
-tools = [TavilySearch()]
-# we add to the create agent function the format
-# This tells the agent: "don't give me a raw string, give me an AgentResponse object." 
-# The LLM will structure its reply to match that schema automatically.
-agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
+# --- Tools (Langchain @tool decorator) ---
+@tool
+def get_product_price(product: str) -> float:
+  """Look up for price of a product in the catalog."""
+  print(f"Executing get_product_price(product='{product}')")
+  # lets define a dictionary of prices for this example:
+  prices = {'telephone': 599.00, "laptop": 1299.99, "headphones": 149.95, "keyboard": 59.95}
+  # access the dictionary called prices and fetch the price of the product, if not listed, give me 0
+  return prices.get(product, 0)
 
-def main():
-    print("Hello")
-    result = agent.invoke(
-        {
-            "messages": HumanMessage(
-                content="Search for three jobs for data analyst in the healthcare sector in companies headquartered in Pittsburgh, Pennsylvania that require use of SQL or Python or R"
-            )
-        }
-    )
-    print(result)
-    print("\n----------------------------------\n")
-    print(result["structured_response"].answer)         # the actual answer text
-    print("\n----------------------------------\n")
-    print(result["structured_response"].sources[0].url)  # first source URL
-    print("\n----------------------------------\n")
-    print(result["structured_response"].sources[1].url)  # second source URL
-    # print("actual readable results")
-    # print(result["messages"][-1].content)
+# Another tool to apply discount:
+@tool
+def apply_discount(price:float, discount_tier:str) -> float:
+  """Apply a discount tier to a price and return the final price.
+  Available tiers are : gold, silver, broze"""
+  print(f"Executing apply_discount(price='{price}, discount_tier={discount_tier}')")
+  discount_percentages = {'bronze': 5, 'silver':10, 'gold': 15}
+  discount = discount_percentages.get(discount_tier, 0)
+  return round(price * (1 - (discount/100)), 2)
 
+# --- Agent loop ---
+# Now define the agents loop raw without langchain, so we need langsmith traces and implementation:
+from langsmith import traceable
 
-# result.answer          # the actual answer text
-# result.sources[0].url  # first source URL
-# result.sources[1].url  # second source URL
+# We use the traceable function as a decorator, will help trace all inside the scope of this
+@traceable(name="LangChain Agent Loop")
+def run_agent(question: str):
+  pass
 
 if __name__ == "__main__":
-    main()
+  print("Hello")
+  print('--')
+  result = run_agent("whats the price of a laptop with gold discount?")
+
+
+
+
+
+ 
