@@ -35,3 +35,4 @@ Also interesting to usethe debugger and se eeach step:
 2. ToolMessage: search
 3. AIMessage: cant connect to internet :(
 
+Best practice in langchain:
