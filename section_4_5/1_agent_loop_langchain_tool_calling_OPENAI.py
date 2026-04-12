@@ -10,7 +10,6 @@ from langchain.chat_models import init_chat_model
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 
-
 MAX_ITERATIONS = 10
 MODEL = "qwen3:1.7b"
 
@@ -47,7 +46,9 @@ from langsmith import traceable
 def run_agent(question: str):
     tools = [get_product_price, apply_discount]
     tools_dict = {t.name: t for t in tools}
-    llm = init_chat_model(f"openai:gpt-5", temperature=0) # CHANGE MODEL HERE TO OPEN AI GPT-5
+    llm = init_chat_model(
+        f"openai:gpt-5", temperature=0
+    )  # CHANGE MODEL HERE TO OPEN AI GPT-5
     llm_with_tools = llm.bind_tools(tools=tools)
     print(f"Question: {question}")
     print("=" * 60)

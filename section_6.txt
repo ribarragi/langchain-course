@@ -1,0 +1,82 @@
+Since we no longer use the tools decorator because we are doing all raw, then we ned to figure out how to 
+provide the ools to the model, and this depends on the LLM we are using.
+
+Two options for OLLAMA (only):
+1. based on olllama documentation, we must provide the tools explicitly here manually as a JSON
+2. ollama can convert python funcitons into tools that can be used in ollama, but needs functions to have 
+docstrings in the google docstrings format
+
+For Anthropic:
+Defiene tools as JSON with a bit different schema
+
+This means that changing models is costly
+
+The @tools decorator bascially converts our python function into the LLM vendor - specific JSON schema
+so we dont have to do it by hand. 
+
+Another option offered by Ollama is doing it if we write our python function using the google format for the dosctring:
+
+  NOTE: Ollama can also auto-generate these schemas if you pass the functions
+  directly as tools (similar to LangChain's @tool decorator):
+    tools_for_llm = [get_product_price, apply_discount]
+  However, this requires your docstrings to follow the Google docstring format
+  so Ollama can parse parameter descriptions from the Args section. 
+For example:
+   def get_product_price(product: str) -> float:
+       """Look up the price of a product in the catalog.
+ 
+        Args:
+            product: The product name, e.g. 'laptop', 'headphones', 'keyboard'.
+ 
+        Returns:
+            The price of the product, or 0 if not found.
+        """
+  We keep the manual JSON version here so you can see what @tool hides from you.
+
+Now a second thing we cannot use is:
+    llm = init_chat_model(...)
+    llm_with_tools = llm.bind_tools(tools=tools)
+    ai_message = llm_with_tools.invoke(messages)
+We must use the ollama chat model because
+it is not a langchain model. So we need to create a traing function. with langchain we get out
+of the box tracing, but not here. So we create the ollama_chat_traced function
+Now we are doing:
+    response = ollama_chat_traced(messages=messages)
+    ai_message = response.message
+Calling Ollama directly, no LangChain wrapper involved.
+
+This function:
+    @traceable(name="Ollama Chat", run_type="llm")
+    def ollama_chat_traced(messages):
+        return ollama.chat(model=MODEL, tools=tools_for_llm, messages=messages)
+is a function because we weant to keep the trace, but the reall call is happening in the
+ollama.chat and passing the model, tools and messages, but we put it into a function so we can still
+trace it with LangSmith
+
+Manual tracing with @traceable
+Before LangChain sent traces to LangSmith automatically. 
+Now since you're not using LangChain, you manually decorate functions with @traceable to get the same visibility.
+
+Before we had:
+  SystemMessage(content="...")
+  HumanMessage(content=question)
+  ToolMessage(content=str(observation), tool_call_id=tool_call_id)
+No we must do it all manually in plain JSON:
+  {"role": "system", "content": "..."}
+  {"role": "user", "content": question}
+  {"role": "tool", "content": str(observation)}
+
+
+Attribute access instead of dictionary access
+Before the tool call was a dict so I used .get():
+    tool_name = tool_call.get("name")
+    tool_args = tool_call.get("args", {})
+But now Ollama returns an object, so we use dot notation:
+    tool_name = tool_call.function.name
+    tool_args = tool_call.function.arguments
+
+And before we used invoke (which is essentially LangChain's middleman that added tracing, 
+error handling, and a consistent interface on top of the raw calls):
+    observation = tool_to_use.invoke(tool_args)
+Without LangChain's .invoke(), you call the function directly using ** to unpack the arguments dictionary into the function's parameters:
+    observation = tool_to_use(**tool_args)
