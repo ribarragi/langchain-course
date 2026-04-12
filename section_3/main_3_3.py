@@ -9,9 +9,10 @@ from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
+
 # Pydantic is a library for defining structured data schemas. Instead of the agent returning a messy
-# string, you can force it to return a proper object with specific fields. 
-# Field lets you add a description to each field, which the LLM reads to understand what 
+# string, you can force it to return a proper object with specific fields.
+# Field lets you add a description to each field, which the LLM reads to understand what
 # to put there.
 from pydantic import BaseModel, Field
 
@@ -28,16 +29,17 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 from langchain_tavily import TavilySearch
 
 
-
 # need to describe the sources that the agent uses to get the answers
 # Source inherits from oydantic BaseModel
-# we want our agent not to response a string but an agent response object that 
+# we want our agent not to response a string but an agent response object that
 # we can use downstream into an application
-# Defines what a "source" looks like — just a URL. The LLM will populate 
+# Defines what a "source" looks like — just a URL. The LLM will populate
 # this with the actual web pages it used to find the answer.
 class Source(BaseModel):
     """Schema for a source used by the agent"""
-    url: str = Field(description= "The URL of the source")
+
+    url: str = Field(description="The URL of the source")
+
 
 # This is the shape of the full response you want back. Instead of a raw string you get a structured object with:
 # answer — the actual reply
@@ -47,14 +49,18 @@ class AgentResponse(BaseModel):
     """Schema for the agent response"""
 
     answer: str = Field(description="The agent's answer to the query")
-    sources: List[Source] = Field(default_factory=list, description="List of sources used to generate answer")
+    sources: List[Source] = Field(
+        default_factory=list, description="List of sources used to generate answer"
+    )
+
 
 llm = ChatOpenAI()
 tools = [TavilySearch()]
 # we add to the create agent function the format
-# This tells the agent: "don't give me a raw string, give me an AgentResponse object." 
+# This tells the agent: "don't give me a raw string, give me an AgentResponse object."
 # The LLM will structure its reply to match that schema automatically.
 agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
+
 
 def main():
     print("Hello")
@@ -67,7 +73,7 @@ def main():
     )
     print(result)
     print("\n----------------------------------\n")
-    print(result["structured_response"].answer)         # the actual answer text
+    print(result["structured_response"].answer)  # the actual answer text
     print("\n----------------------------------\n")
     print(result["structured_response"].sources[0].url)  # first source URL
     print("\n----------------------------------\n")

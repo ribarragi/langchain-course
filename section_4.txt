@@ -36,3 +36,125 @@ second iteration of the LLM, it knows that it must now apply a different tool. S
 another Observation.
 In the third iteration of the agent, we send the LLM the query, the first output, the second output, what tools it executed, the whole history, Sothe agent has enough
 information to decide not to use another tool, but to provide the answer. 
+
+The structure of the run_agent function:
+def run_agent(question: str):
+    # 1. Setup tools
+    # 2. Setup LLM
+    # 3. Build initial messages
+    # 4. Agent loop
+
+Why does messages start with SystemMessage first?
+Order matters. The LLM reads messages in sequence, so:
+SystemMessage first — sets the rules before anything else
+HumanMessage second — the actual question
+If you put HumanMessage first the LLM might start reasoning before it knows the rules.
+
+messages is just a list that represents the conversation so far. 
+
+messages = [
+        SystemMessage(
+            content=(
+              "..."
+            )
+        ),
+        HumanMessage(content=question),
+    ]
+
+Every message has a role (System, Human, AI, Tool) and content. 
+The LLM reads this entire list every time it's called to understand the full context.
+
+Think of messages like a briefing packet you hand to a new employee:
+SystemMessage = the employee handbook and rules
+HumanMessage = the customer's request
+
+interations loop:
+Crealy shows the interacion with the llm and its thought steps.
+
+Now the loop part is the heart of the agent
+for iteration in range(1, MAX_ITERATIONS + 1):
+        ai_message = llm_with_tools.invoke(messages)
+        tool_calls = ai_message.tool_calls
+        if not tool_calls:
+            answer = ai_message.content
+            return answer
+                tool_call = tool_call[0]
+        
+        tool_name = tool_call.get("name")
+        tool_args = tool_call.get("args", {})
+        tool_call_id = tool_call.get("id")
+        print(f"[Tool Selected] {tool_name} with args: {tool_args}")
+
+        tool_to_use = tools_dict.get(tool_name)
+        if tool_to_use is None:
+            raise ValueError(f"Tool '{tool_name}' not found")
+        
+        observation = tool_to_use.invoke(tool_args)
+
+        print(f"[Tool Result] {observation}")
+
+        messages.append(ai_message)
+        messages.append(
+            ToolMessage(content=str(observation), tool_call_id=tool_call_id)
+        )
+
+Outside the iterations loop:
+print("ERROR: max iterarions reached with no answer")
+return None
+
+
+
+This part: ai_message = llm_with_tools.invoke(messages)
+Every iteration sends the entire conversation history to the LLM. 
+The LLM reads everything — system rules, the question, any tool results so far — and decides what to do next. 
+It returns an ai_message which contains either:
+A tool call — "I need to call get_product_price"
+A final answer — "The price with discount is $1,104.99"
+
+
+This part: tool_calls = ai_message.tool_calls
+Extracts the tool call decisions from the LLM's response. This is a list that looks like:
+[{"name": "get_product_price", "args": {"product": "laptop"}}]
+
+This part and the 3 following: tool_name = tool_call.get("name")
+Are just fetching the tool called from the llm. So the llm decided it will call a tool, now we need to 
+get what tool it decided to use (if any) and then we do this: tool_to_use = tools_dict.get(tool_name)
+to get the actual python function from our local dictionary of functions looking for it usingits name 
+so we can go ahead and comply with llms decision to use a tool. in this example we are inly doing the first one
+it could be that there are more than 1 that the llm decided to use
+
+This part:         if tool_to_use is None:
+            raise ValueError(f"Tool '{tool_name}' not found")
+in case the llm gives you a tool name that doesnt exist, it can hallucinate. If it gives a 
+reponse backthat says responde, dont use a tool, it never reaches this aprt, there is an if statement above for that
+
+This part: observation = tool_to_use.invoke(tool_args) is key, it actually runs the tool!
+
+This part:    messages.append(ai_message)
+Adds the LLM's tool call decision to the conversation history. So now messages looks like:
+SystemMessage: rules...
+HumanMessage: "what's the price of a laptop with gold discount?"
+AIMessage: "I'll call get_product_price(laptop)"  ← newly added
+
+And this part: Adds the actual tool result to the conversation history. 
+              messages.append(
+                  ToolMessage(content=str(observation), tool_call_id=tool_call_id)
+              )
+SystemMessage: rules...
+HumanMessage: "what's the price of a laptop with gold discount?"
+AIMessage: "I'll call get_product_price(laptop)"
+ToolMessage: "1299.99"  ← newly added
+
+
+Important to go and check the trace
+
+To run the code, remember to activate ollama:
+ollama run qwen3:1.7b
+orollama serve
+
+and kill it
+pkill -f ollama
+or better: kill it in the top tab of computer, the little llama
+
+check if running:
+ps aux | grep ollama
