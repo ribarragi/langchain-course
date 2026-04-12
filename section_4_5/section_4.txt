@@ -158,3 +158,6 @@ or better: kill it in the top tab of computer, the little llama
 
 check if running:
 ps aux | grep ollama
+
+
+THE LANGCHAIN CREATE_AGENT() FUNCTION IMPLEMENTS SOMETHING VERY SIMILAR TO WHAT WE DID
