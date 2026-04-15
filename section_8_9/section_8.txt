@@ -1,0 +1,25 @@
+Function calling / Tool calling
+
+We are going to rely on the model provider instead of the react prompt.
+So the llm will output the funciton call, a nice JSON with function name,
+argument, and we take the json, parse it and continue with the agent algorithm.
+This is way more robust.
+
+Function/tool calling is the model ability to produce a structured call to an external function
+
+Function calling is a capability of certain llms, not all, but most of them do. 
+State of the art models do.
+
+Model detects when a funciton should be invoked based on users request and format its reponse as a valid JSON adhereing 
+to function schema, meaning it knows when to call it and it passes the correct arguments.
+So our application can take the response and apply the function.
+Then take the response and plug in back to the llm and continue.
+
+Two main capabilities that function calling gives us:
+  1. To connect LLM to external tools
+  2. To get structured outut from the llm so we can downstream to our app
+  3. Its cheaper in terms of tokens because it doesnt output all the chain of thought of the llm
+
+
+
+

@@ -8,9 +8,8 @@ __pycache__/
 env/
 venv/
 conda-env/
+**/.env
 
-# Environment variables (IMPORTANT)
-.env
 
 # VS Code
 .vscode/

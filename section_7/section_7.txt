@@ -1,0 +1,58 @@
+ReAct prompt. Perhaps the most important in agents, its the basis for agents.
+Helps LLM act as reasoning agent.
+We are implementing an agent with no function calling.
+
+The ReAct prompt is the foundation of function calling. So we are using ReAct prompt instead of function calling
+
+Original prompt by hwchase17/react-chat-json:
+https://smith.langchain.com/hub/hwchase17/react-chat-json
+Question - Thought - Action - Observation - Final answer
+
+Agent scratchpad holds all history of agent: which tools chose, why did it choose them, observations (output).
+Updated to latest results.
+
+Now in the code we want to implement the agent loop without function calling.
+
+We have the ReAct prompt making the llm reason and select the correct tools
+
+This is the promt with the elemtns:
+'\nSTRICT RULES — you must follow these exactly:\n
+1. NEVER guess or assume any product price. You MUST call get_product_price first to get the real price.\n
+2. Only call apply_discount AFTER you have received a price from get_product_price. Pass the exact price returned by get_product_price — do NOT pass a made-up number.\n
+3. NEVER calculate discounts yourself using math. Always use the apply_discount tool.\n
+4. If the user does not specify a discount tier, ask them which tier to use — do NOT assume one.\n\n
+
+Answer the following questions as best you can. You have access to the following tools:\n\n
+
+get_product_price(product: str) -> float - Look up for price of a product in the catalog.\n
+apply_discount(price: float, discount_tier: str) -> float - Apply a discount tier to a price and return the final price.\n
+Available tiers are : gold, silver, broze\n\nUse the following format:\n\n
+
+Question: the input question you must answer\nThought: you should always think about what to do\nAction: the action to take, should be one of [get_product_price, apply_discount]\n
+Action Input: the input to the action, as comma separated values\n
+Observation: the result of the action\n
+... (this Thought/Action/Action Input/Observation can repeat N times)\n
+Thought: I now know the final answer\nFinal Answer: the final answer to the original input question\n\n
+
+Begin!\n\n
+
+Question: whats the price of a laptop with gold discount?\n
+Thought:'
+
+# raw response of LLM
+'Thought: I need to first get the price of the laptop using the get_product_price tool. Then apply the gold discount using apply_discount.\n
+Action: get_product_price\n
+Action Input: product=laptop'
+It doesnt produce anything after action input, it stops genetrating output when it hits and starts observation
+
+Agent scratchpad 
+
+
+NOTE THAT: this implementation is fragile, we rely on the LLM responding with this exact format and
+scheme, otherwise we wont be able to find the stuf, this will break. This is not very reliable.
+if we change LLM and the prompt is not handled correctly we will get errors. So function calling
+made it way more reliable.
+
+We understand how funciton calling is working under the hood, its hard to implement from zero. A lot of 
+edge cases.
+Langchain save all this effort se we can focus on the business rules.

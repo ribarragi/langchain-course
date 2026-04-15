@@ -1,0 +1,103 @@
+Retrieval augmentation generation (RAG)
+
+LLMs have two big limitations:
+  - Knowledge cutoff — they don't know anything after their training date
+  - No access to private data
+What does RAG do:
+Instead of relying solely on the LLM's training, RAG retrieves relevant information first 
+and then feeds it to the LLM as context before asking it to answer.
+
+User asks a question
+        ↓
+Search your documents for relevant info  ← the "Retrieval" part
+        ↓
+Feed that info + question to the LLM
+        ↓
+LLM generates answer based on YOUR data  ← the "Augmented Generation" part
+
+Question to self: feed raw claims and enrollment data into llm as RAG? No, right, only the
+outout of functions, that should be enough.
+
+First solution: add all the context to the prompt :( NO
+Notice that we cannot add all the context to the prompt: the prompt has limits, its non escalable,
+we will exceed token limits, the llm will be less effective with very long prompts, llm takes too long to process.
+
+Second solution: split the context into chunks, take user query, find the most
+relevant chunk for the question and plug only the relevant chunk of context to the prompt with the question.
+LLm will have it easier to response and less expensive. BUT we need to preprocess the context docs and split them
+into chunks, what if the context is a code repository, what if we dont know the context documents and we get it 
+dinamically from user. Also, we need a searching emchanism to find relevant chunks.
+
+What's a token?
+Roughly 1 token = 0.75 words. 
+
+A way to think about RAG is:
+You feed the llm only with the relevant chunk of data.
+
+Now, to find the relevant chunks of data, RAG doesn't 
+just do a keyword search like Google. It uses something called vector embeddings which converts 
+text into numbers that represent meaning, so it can find chunks that are semantically similar to 
+the question even if they don't share the exact same words.
+
+1000 PDFs stored somewhere
+        ↓
+User asks a question
+        ↓
+RAG searches and finds the 3-4 most relevant chunks
+        ↓
+Only those chunks get sent to the LLM
+        ↓
+LLM answers based on just those chunks
+
+So another important element are vector embeddings
+
+Vector embeddings
+
+- Langchain document loaders: LangChain Document Loaders are tools that fetch and 
+standardize data from different sources so it can be fed into a RAG pipeline.
+They take raw data from any source and convert it into a standard LangChain 
+Document object that always looks like:
+Document(
+    page_content="the actual text...",
+    metadata={"source": "company_policy.pdf", "page": 3}
+)
+
+- Langchain text splitters: LangChain Text Splitters are tools that break large 
+documents into smaller chunks so they can be efficiently stored and retrieved in a RAG pipeline.
+The problem they solve
+After loading your documents you have large blocks of text — maybe an entire PDF. 
+You can't store or search that efficiently. You need to break it into smaller pieces 
+so RAG can find only the relevant parts instead of returning the whole document.
+They split text based on rules you define (chunk size, chunk overlap).
+We want to keep stuff semantically related.
+We can reassemble back together.
+
+Only send the chunks with high probabilty of having the answer to the llm
+
+- Embeddings: Embeddings convert text into lists of numbers (called vectors) 
+that represent the meaning of the text. Words with similar meaning end up with similar vectors.
+The idea of embeddings is to create a vectoric space from the text such that the
+distance between the vectors in the space have a certain meaning.
+In goo embedding models, text with similar semantic meaning represented in vectors 
+that are very close together (you can measure vecotrs distance).
+
+We find the data that whose embedding is closest to the query and send in that data with the prompt to the llm
+and thell the llm to use that context to answer the question. The vector database is a database that is saving 
+those embeddings and provides us the closest vector to the one we have.
+
+Steps: embed each chunk of the data, save them into vector database (eg.pinecone), 
+take users question, embed it into question, place it into vector space and take only context embeddings
+that are closest tot h query vector, those sematically close, and send only the relevant context and the query into LLM.
+
+
+- Vector Stores: A database specifically designed to store and search vectors 
+(the numbers embeddings generate).
+The problem they solve: You might have millions of chunks each converted to vectors. 
+
+You need a way to quickly find which vectors are most similar to your query vector. 
+A regular database can't do this efficiently — vector stores are optimized specifically for this.
+
+
+Code:
+Do an entire RAG pipeline from ingestion to retrieval.
+Set up environment.
