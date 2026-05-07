@@ -78,16 +78,16 @@ Only send the chunks with high probabilty of having the answer to the llm
 that represent the meaning of the text. Words with similar meaning end up with similar vectors.
 The idea of embeddings is to create a vectoric space from the text such that the
 distance between the vectors in the space have a certain meaning.
-In goo embedding models, text with similar semantic meaning represented in vectors 
+In good embedding models, text with similar semantic meaning represented in vectors 
 that are very close together (you can measure vecotrs distance).
 
-We find the data that whose embedding is closest to the query and send in that data with the prompt to the llm
-and thell the llm to use that context to answer the question. The vector database is a database that is saving 
+We find the data whose embedding is closest to the query and send in that data with the prompt to the llm
+and tell the llm to use that context to answer the question. The vector database is a database that is saving 
 those embeddings and provides us the closest vector to the one we have.
 
 Steps: embed each chunk of the data, save them into vector database (eg.pinecone), 
 take users question, embed it into question, place it into vector space and take only context embeddings
-that are closest tot h query vector, those sematically close, and send only the relevant context and the query into LLM.
+that are closest to the query vector, those sematically close, and send only the relevant context and the query into LLM.
 
 
 - Vector Stores: A database specifically designed to store and search vectors 
