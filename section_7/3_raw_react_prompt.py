@@ -1,6 +1,7 @@
 # from _typeshed import OpenBinaryMode
 from dotenv import load_dotenv
 import os
+
 # load_dotenv()
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 from langsmith import traceable
@@ -10,12 +11,12 @@ import ollama
 # regex because we wont use function calling, so we wont get JSON file, but receive the llm's
 # raw response, and need to aprse form tet what function to be called.
 import re
+
 # inspect to get metadata on the functions that we will use as tools to use in llm and propagate
 import inspect
 
 MAX_ITERATIONS = 10
 MODEL = "qwen3:1.7b"
-
 
 
 # --- Tools (no longer using the @tool decorator) ---
@@ -42,7 +43,6 @@ def apply_discount(price: float, discount_tier: str) -> float:
     discount_percentages = {"bronze": 5, "silver": 10, "gold": 15}
     discount = discount_percentages.get(discount_tier, 0)
     return round(price * (1 - (discount / 100)), 2)
-
 
 
 # tools_for_llm = [
@@ -84,20 +84,18 @@ def apply_discount(price: float, discount_tier: str) -> float:
 # ]
 
 # We will instead of tools_for_llm , we will create a dictionary of the tools:
-tools = {
-    "get_product_price":get_product_price,
-    "apply_discount":apply_discount
-}
+tools = {"get_product_price": get_product_price, "apply_discount": apply_discount}
+
 
 # we need to inform the llm about the tools:
-# receives the tool dicitonary as input, iterates over the tools and for each tool, gets its metadata, 
-# its arguments, return value, docstring and format everything as a string so we can inject it into our ReAct 
+# receives the tool dicitonary as input, iterates over the tools and for each tool, gets its metadata,
+# its arguments, return value, docstring and format everything as a string so we can inject it into our ReAct
 # prompt and send to LLM
 def get_tool_descriptions(tools_dict):
     descriptions = []
-    #first element the key, second element the function
+    # first element the key, second element the function
     for tool_name, tool_function in tools_dict.items():
-        # for every function i want to get it metadata, 
+        # for every function i want to get it metadata,
         # __wrapped__ bypasses decorator wrappers (e.g., @traceable adds *, config=None)
         # but since all funcitons are traced with langsmith, we need the original function before the
         # langsmith decorator: this basically gets us the function implementation
@@ -106,12 +104,13 @@ def get_tool_descriptions(tools_dict):
         # Now i need the metadata of the function: name, arguments and types, return value type
         # inspect.signature(getattr(apply_discount, "__wrapped__", apply_discount))  gives you: <Signature (price: float, discount_tier: str) -> float>
         signature = inspect.signature(original_function)
-        # inspect.getdoc(apply_discount) or "" gives you the docstring (or empty string) 
+        # inspect.getdoc(apply_discount) or "" gives you the docstring (or empty string)
         docstring = inspect.getdoc(tool_function) or ""
         # append allinto desrcriptions list
         descriptions.append(f"{tool_name}{signature} - {docstring}")
     # join into one string to propagate into the LLM
     return "\n".join(descriptions)
+
 
 tool_descriptions = get_tool_descriptions(tools)
 tool_names = ", ".join(tools.keys())
@@ -145,6 +144,7 @@ Begin!
 Question: {{question}}
 Thought:"""
 
+
 # --- Helper tool for trace Ollama calls ---
 # with lagchain we get out of the box tracing, here we need to manually trace llm calls for langsmith
 @traceable(name="Ollama Chat", run_type="llm")
@@ -153,6 +153,8 @@ def ollama_chat_traced(model, messages, options):
     # we will use the raw intelligence of the model instead of the tools_for_llm, so it will
     # still call ollama and receive the model, messages and options: special configurations for the llm
     return ollama.chat(model=model, messages=messages, options=options)
+
+
 # The options are the stop arguments: its telling the LLM to, after it used the tool, dont go ahead and hallucinate
 # and keep going, but rather stop, and then be fed the output of the tool, and then continue
 
@@ -168,8 +170,6 @@ def run_agent(question: str):
     #     "apply_discount": apply_discount,
     # }
 
-    
-    
     print(f"Question: {question}")
     print("=" * 60)
     # we dont need the system prompt anymore, now we need scratchpad:
@@ -177,7 +177,7 @@ def run_agent(question: str):
     # If we look at the promt, at build timethe tool_descriptions and tool_names will be fed
     # But at runtime, the question will be plugged dinamycally from the user.
     prompt = react_prompt.format(question=question)
-    #screatchpad will contain the history of what the LLM has done so far, tool choices, observations, ...
+    # screatchpad will contain the history of what the LLM has done so far, tool choices, observations, ...
     # we will appoend the scratchpad tot he original ReAct prompt
     scratchpad = ""
 
@@ -214,11 +214,11 @@ def run_agent(question: str):
         # response = ollama_chat_traced(messages=messages)
         response = ollama_chat_traced(
             # we call it with model, messages is only one message everytime which is the instructions to llm plus users question
-            model = MODEL,
-            messages = [{"role":"user", "content":full_prompt}],
+            model=MODEL,
+            messages=[{"role": "user", "content": full_prompt}],
             # and the options we send a dictionary with stop options: llm to stop generating text after it
             # produces the \nObservation token
-            options={"stop": ["\nObservation"], "temperature":0},
+            options={"stop": ["\nObservation"], "temperature": 0},
         )
         # We need to add .content, but this is not yet the ai message, its the putput of llm
         # ai_message = response.message
@@ -240,7 +240,7 @@ def run_agent(question: str):
             print("\n" + "=" * 60)
             print(f"Final Answer: {final_answer}")
             return final_answer
-        
+
         # remove this tool_call
         # tool_calls = ai_message.tool_calls
         # print(tool_calls)
@@ -255,7 +255,7 @@ def run_agent(question: str):
         # Now we need to add Parse tool calls from raw text with regex — fragile if LLM doesn't follow format.
         # The previous part habndles the part that goes from the thoughts to the final answer
         # now we need to habdle the part that goes from the thought to the tool:
-        # right before the observation the llm gives Action and Action Input, so we need to look for them 
+        # right before the observation the llm gives Action and Action Input, so we need to look for them
 
         # NOTE THAT: this implementation is fragile, we rely on the LLM responding with this exact format and
         # scheme, otherwise we wont be able to find the stuf, this will break. This is not very reliable.
@@ -293,17 +293,16 @@ def run_agent(question: str):
 
         # If the tool name doesnt exist in the tools (e.g. hallucination) then the observation should cointain error
         # but not an exepmtion, we give a chance to the llm to correct itself because in the next iteration the
-        # llm make take this stuff and correct itself to make agent more reliable. 
-        # If the tools exists then we want it to run it. We send it the aprse args 
+        # llm make take this stuff and correct itself to make agent more reliable.
+        # If the tools exists then we want it to run it. We send it the aprse args
         print(f"  [Tool Executing] {tool_name}({args})...")
         if tool_name not in tools:
             observation = f"Error: Tool '{tool_name}' not found. Available tools: {list(tools.keys())}"
-        else:        
-            # The tool can return and int, float, ..., any type. But LLms can only digest TEXT, so we need 
+        else:
+            # The tool can return and int, float, ..., any type. But LLms can only digest TEXT, so we need
             # # to cast it as such after we get the result
             observation = str(tools[tool_name](*args))
-        
-        
+
         print(f"  [Tool Result] {observation}")
 
         # Now we need to handle the part from the tool to the thought again, containing the
@@ -321,9 +320,6 @@ def run_agent(question: str):
         # Question - Thought - Action - Action Input). The LLM will know what happened in the previous iteration
         # History is one growing string re-sent every iteration (replaces messages.append).
         scratchpad += f"{output}\nObservation: {observation}\nThought:"
-
-
-
 
     print("ERROR: max iterarions reached with no answer")
     return None

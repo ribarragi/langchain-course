@@ -1,6 +1,7 @@
 # This part is to load the API key
 # To access the environment variable
 import os
+
 # Chat model and wrapper over the OpenAI API
 # from langchain_openai import ChatOpenAI
 # from langchain_core.prompts import PromptTemplate
@@ -15,6 +16,7 @@ from langchain_openai import ChatOpenAI
 # load_dotenv()
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
+
 # Lets start by defininf a search tool:
 @tool
 def search(query: str) -> str:
@@ -26,20 +28,25 @@ def search(query: str) -> str:
         The search result
     """
     print(f"Searching for {query}")
-    print("Tokyo weather is sunny") #test
+    print("Tokyo weather is sunny")  # test
+
 
 llm = ChatOpenAI()
 # a list of toools we are giving the agent in this case, the tool search
 # that consists of printing searching for query and then tokyo weather is sunny
 tools = [search]
 # creates an agent by combining llm and the tools
-agent = create_agent(model = llm, tools = tools)
+agent = create_agent(model=llm, tools=tools)
+
 
 def main():
     print("Hello")
     # human message to format a message as coming from a human
-    result = agent.invoke({"messages":HumanMessage(content = 'Whats the weather in Tokyo')})
+    result = agent.invoke(
+        {"messages": HumanMessage(content="Whats the weather in Tokyo")}
+    )
     print(result)
+
 
 if __name__ == "__main__":
     main()
@@ -59,7 +66,6 @@ if __name__ == "__main__":
 #   ↓
 # result is returned to main()
 #   → print(result)                         prints: the full agent response object
-
 
 
 # Very important to note:

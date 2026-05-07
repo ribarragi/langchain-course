@@ -145,17 +145,16 @@ def run_agent(question: str):
     # Implement the agent loop:
     for iteration in range(1, MAX_ITERATIONS + 1):
         print(f"\n  -- iteration {iteration} --")
-        
+
         # ai_message = llm_with_tools.invoke(messages)
         # tool_calls = ai_message.tool_calls
-        
+
         # here we use the function we built instead:
         # response is an ollma reponse, not a langchain
         response = ollama_chat_traced(messages=messages)
         ai_message = response.message
 
         tool_calls = ai_message.tool_calls
-
 
         print(tool_calls)
         if not tool_calls:
@@ -166,7 +165,7 @@ def run_agent(question: str):
         # tool_name = tool_call.get("name")
         # tool_args = tool_call.get("args", {})
         # tool_call_id = tool_call.get("id")
-        
+
         # Attribute access (.function.name) instead of dict access (.get("name"))
         tool_name = tool_call.function.name
         tool_args = tool_call.function.arguments

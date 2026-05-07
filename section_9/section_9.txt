@@ -101,3 +101,35 @@ A regular database can't do this efficiently — vector stores are optimized spe
 Code:
 Do an entire RAG pipeline from ingestion to retrieval.
 Set up environment.
+
+Using langchain-pinecone and langchain-community for community code
+Pinecone is a managed vector store
+
+ In file ingestion.py: ingests the text, chunks into pieces, embbed every 
+ chunk and turn into vector, store each vector in the pinecone vector store.
+ Pinecone is the vector store:
+ Documents
+    ↓
+Text Splitter (chunks)
+    ↓
+Embeddings (chunks → vectors/numbers)
+    ↓
+Pinecone  ← stores those vectors and lets you search them
+    ↓
+RetrievalQA Chain
+    ↓
+LLM
+
+Ingestion: take the data and load it into langchain doc object, split doc into 
+chunks with langchain splitter, embbed chunks and turn into vectors, and store vectors in pineone vector store
+
+Document loaders: how to load and process data to make it difgestible for llm, any type of text data
+Text splitter: to help us with large pieces of text. We tae large text and put into chunks.
+They have a lost of logic: strategies to compute chunks and chunks sizes.
+Chunk overlap: how much overlap between chunks: can be helpful to ensure that
+text is not split in ways that disturb context or meaning.
+Embedding model/encoder: Kind of a blackbox that takes text and outputs embedded vectors of 
+text. Options include:Cohere, Huggingface, openai...
+Vector databases: Persistence storage, where to store the vectors (pinecone). There are other options though,
+like FAISS (Meta), Chroma or many DB comapnies support vector db (PostgreSQL with the pgvector extension (MongoDB, Redis, Elasticsearch)
+And if the document is small enough even do it locally using RAM: from langchain_community.vectorstores import DocArrayInMemorySearch
