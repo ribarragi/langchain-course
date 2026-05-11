@@ -27,3 +27,16 @@ if __name__ == "__main__":
     )
     # loads the file into a langchain document
     document = loader.load()
+    
+    # document will be a list of langchain documents. Some key attributes: page_content (content), metadata (source),...
+
+    # Next we go and split text 
+    print('splitting...')
+    # character texr splitter object. It has a lot of customizations, but here very basic, just
+    # the chunk size (1000 characters, rule of thumb is to keep it small enough to fir in the 
+    # context window and it is readable, so 1000 chars sounds good) and the overlap.
+    # We want overlaping data when we dont want to add context bewtween chuns.
+    text_splitter = CharacterTextSplitter(chunk_size = 1000, chunk_overlap = 0)
+    # we invoke the function, the method split_documents recevies a list of langchain documents 
+    texts = text_splitter.split_documents(document)
+    print(f"created: {len(texts)} chunks")

@@ -123,7 +123,11 @@ LLM
 Ingestion: take the data and load it into langchain doc object, split doc into 
 chunks with langchain splitter, embbed chunks and turn into vectors, and store vectors in pineone vector store
 
-Document loaders: how to load and process data to make it difgestible for llm, any type of text data
+Document loaders: how to load and process data to make it difgestible for llm, any type of text data, 
+document loader is a LangChain tool that fetches and standardizes data from different sources so it can be fed into a RAG pipeline.
+
+There are loaders for everything: videos, slack files, whatsapp files...
+
 Text splitter: to help us with large pieces of text. We tae large text and put into chunks.
 They have a lost of logic: strategies to compute chunks and chunks sizes.
 Chunk overlap: how much overlap between chunks: can be helpful to ensure that
