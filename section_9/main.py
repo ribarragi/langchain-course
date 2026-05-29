@@ -120,9 +120,6 @@ def create_retrieval_chain_with_lcel():
     """
     # this will be the rturn value for this function,
     retrieval_chain = (
-        RunnablePassthrough.assign(
-            context=itemgetter("question") | retriever | format_docs
-        )
         # these are piped: the prompt templated piped to the llm and the llm to the str output parser
         # the prompt template will be the prompt template of the direct prompt that we wrote with the users question
         # and the retrieve context, we pipe that into the llm, meaning we will invoke the llm with that input, and once
@@ -143,6 +140,9 @@ def create_retrieval_chain_with_lcel():
         # out the question string
         # in other words: the input to the RunnablePassthrough.assign(...) is input_dict = {'question':'what is pinecone'} but once it opasses though it we
         # add another key: item pair: input_dict = {'question':'what is pinecone', 'context':'doc1\ndoc2\ndoc3'}
+        RunnablePassthrough.assign(
+            context=itemgetter("question") | retriever | format_docs
+        )
         | prompt_template
         | llm
         | StrOutputParser()
@@ -177,3 +177,24 @@ if __name__ == "__main__":
     # result_without_lcel = retrieval_chain_without_lcel(query)
     # print("\nAnswer:")
     # print(result_without_lcel)
+
+    # ========================================================================
+    # Option 2: Use implementation WITH LCEL (Better Approach)
+    # ========================================================================
+    print("\n" + "=" * 70)
+    print("IMPLEMENTATION 2: With LCEL - Better Approach")
+    print("=" * 70)
+    print("Why LCEL is better:")
+    print("- More concise and declarative")
+    print("- Built-in streaming: chain.stream()")
+    print("- Built-in async: chain.ainvoke()")
+    print("- Easy to compose with other chains")
+    print("- Better for production use")
+    print("=" * 70)
+
+    # we call the create_retrieval_chain_with_lcel, this will return us a LC chain, a runnable, so it has the invoke method
+    # we can invoke it the with th einput of the dictionary with the key of question and users query
+    chain_with_lcel = create_retrieval_chain_with_lcel()
+    result_with_lcel = chain_with_lcel.invoke({"question": query})
+    print("\nAnswer:")
+    print(result_with_lcel)
