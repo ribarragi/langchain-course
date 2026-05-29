@@ -42,26 +42,22 @@ def format_docs(docs):
     """Format retrieved documents into a single string."""
     return "\n\n".join(doc.page_content for doc in docs)
 
-# Retrieval without langcahin expression language, recevies a string and returns response of LLM
-# without langchain expression language
-def retrieval_chain_without_lcel()
-
 # we have the query there
 if __name__ == "__main__":
-    # print("Retrieving...")
+    print("Retrieving...")
 
-    # # Query
-    # query = "what is Pinecone in machine learning?"
+    # Query
+    query = "what is Pinecone in machine learning?"
 
-    # # ========================================================================
-    # # Option 0: Raw invocation without RAG
-    # # ========================================================================
-    # print("\n" + "=" * 70)
-    # print("IMPLEMENTATION 0: Raw LLM Invocation (No RAG)")
-    # print("=" * 70)
-    # # we invoke the llm and send the raw query with no additional context (no RAG)
-    # result_raw = llm.invoke([HumanMessage(content=query)])
-    # print("\nAnswer:")
-    # print(result_raw.content)
+    # ========================================================================
+    # Option 0: Raw invocation without RAG
+    # ========================================================================
+    print("\n" + "=" * 70)
+    print("IMPLEMENTATION 0: Raw LLM Invocation (No RAG)")
+    print("=" * 70)
+    # we invoke the llm and send the raw query with no additional context (no RAG)
+    result_raw = llm.invoke([HumanMessage(content=query)])
+    print("\nAnswer:")
+    print(result_raw.content)
 
 

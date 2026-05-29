@@ -40,3 +40,17 @@ if __name__ == "__main__":
     # we invoke the function, the method split_documents recevies a list of langchain documents 
     texts = text_splitter.split_documents(document)
     print(f"created: {len(texts)} chunks")
+
+
+    # Now its time to ingest everything: initialize an open ai embeddings object
+    embeddings = OpenAIEmbeddings(openai_api_key=os.environ.get("OPENAI_API_KEY"))
+    # which embeddings will we be using? In this case default.
+    print((f"ingesting ..."))
+    # The langchain vector store, in this case Pinecone, has the from_documents, it will receive 'texts', which
+    # is a list of documents, also the embeddings object which has the information of the embeddings model to use, 
+    # and the index name that we have available in our env var.
+
+    # Langchain will iteratate over all the documents, all the chunks, it will embedd each of them and 
+    # store them in the vector store.
+    PineconeVectorStore.from_documents(texts, embeddings, index_name = os.environ['INDEX_NAME'])
+    print("finish")

@@ -137,3 +137,19 @@ text. Options include:Cohere, Huggingface, openai...
 Vector databases: Persistence storage, where to store the vectors (pinecone). There are other options though,
 like FAISS (Meta), Chroma or many DB comapnies support vector db (PostgreSQL with the pgvector extension (MongoDB, Redis, Elasticsearch)
 And if the document is small enough even do it locally using RAM: from langchain_community.vectorstores import DocArrayInMemorySearch
+
+The idea of the ingestion code is:
+1. Load
+2. Split
+3. Embed
+4. Store
+ALL THIS IS DATA INDEXING:
+We are  taking a text file, breaking it into digestible pieces, converting those pieces 
+into numbers that represent meaning, and storing them in a database optimized for 
+similarity search. After this runs, Pinecone will have your document ready to 
+be queried semantically.
+
+NEXT part is RETRIEVAL: 
+Taking user's question, embedd it, use that vector to find relevant vectors
+meaning relevant context, take original question, augment it with the selected chunks, send to LLM
+and get asnwer back: swe send the question with the relevant context and get back an answer.
