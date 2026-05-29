@@ -149,7 +149,7 @@ into numbers that represent meaning, and storing them in a database optimized fo
 similarity search. After this runs, Pinecone will have your document ready to 
 be queried semantically.
 
-NEXT part is RETRIEVAL: 
+NEXT part is RETRIEVAL (and GENERATION): 
 Taking user's question, embedd it, use that vector to find relevant vectors
 meaning relevant context, take original question, augment it with the selected chunks, send to LLM
 and get asnwer back: swe send the question with the relevant context and get back an answer.

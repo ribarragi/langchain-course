@@ -14,11 +14,11 @@ llm = ChatOpenAI()
 
 # initialize the vector store object, giving it the index name, and give the embeddings model, very similar to ingestion.py
 vectorstore = PineconeVectorStore(
-  index_name=os.environ["INDEX_NAME"], embedding=embeddings
+    index_name=os.environ["INDEX_NAME"], embedding=embeddings
 )
 
 # Now we want to use the vectorstore searching capabilities
-# we take the vectorstore, use its as_retriever method, this will return us an object (vector store retriever) that has 
+# we take the vectorstore, use its as_retriever method, this will return us an object (vector store retriever) that has
 # searching capabilities
 # k=3: every time we want to search in the vector store for the relevant chunks, i want ti limit to only top 3 docs
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
@@ -36,11 +36,13 @@ Question: {question}
 Provide a detailed answer:"""
 )
 
+
 # Now a simple auxiliary function: format_docs will receive docs (langchain documents), and
 # the funciton will take the docs and format them nivcely into a string iteratively
 def format_docs(docs):
     """Format retrieved documents into a single string."""
     return "\n\n".join(doc.page_content for doc in docs)
+
 
 # we have the query there
 if __name__ == "__main__":
@@ -59,5 +61,3 @@ if __name__ == "__main__":
     result_raw = llm.invoke([HumanMessage(content=query)])
     print("\nAnswer:")
     print(result_raw.content)
-
-
