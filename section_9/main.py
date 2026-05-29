@@ -1,21 +1,22 @@
 import os
+
+# import a puython utility funtion that creates a callble object to fish items from an object using indexing
+# we could use lambda functions, but itemgetter is more convenient
+from operator import itemgetter
+
 from dotenv import load_dotenv
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
 
 # need to add this for the langchain expression implementation
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
 # this is a runnable that lets the inputs pass through when invoked, it wont change them,
 # except that it can be configuredso that we can add additional keys to the poutput if the input
 # is a dictionary
 from langchain_core.runnables import RunnablePassthrough
-
-# import a puython utility funtion that creates a callble object to fish items from an object using indexing
-# we could use lambda functions, but itemgetter is more convenient
-from operator import itemgetter
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_pinecone import PineconeVectorStore
 
 # load_dotenv()
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))

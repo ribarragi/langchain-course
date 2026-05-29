@@ -1,1 +1,17 @@
 We will implement a documentation helper / assistant
+Plug in documentation of a package and query with the LLM questions of the documentation: how to use it, examples...
+Write it end to end
+
+https://github.com/emarco177/documentation-helper
+
+Topics to cover:
+ - Vector databases
+ - RetrievelQA chain
+ - Similarity Search
+ - LLM Memory
+ - Streamlit
+
+First need to ingest LC documentation and index it into vector store (embed and put into pinecone)
+Use Tavily to scrape the LC documentation.
+
+# Imports and main classes for ingestion phase

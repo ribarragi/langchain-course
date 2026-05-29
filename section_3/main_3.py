@@ -2,16 +2,16 @@
 # To access the environment variable
 import os
 
-# Chat model and wrapper over the OpenAI API
-# from langchain_openai import ChatOpenAI
-# from langchain_core.prompts import PromptTemplate
-
-
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
+
+# Chat model and wrapper over the OpenAI API
+# from langchain_openai import ChatOpenAI
+# from langchain_core.prompts import PromptTemplate
+
 
 # load_dotenv()
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))

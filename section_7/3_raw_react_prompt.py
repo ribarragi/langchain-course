@@ -1,19 +1,20 @@
 # from _typeshed import OpenBinaryMode
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
 
 # load_dotenv()
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
-from langsmith import traceable
-import ollama
+# inspect to get metadata on the functions that we will use as tools to use in llm and propagate
+import inspect
 
 # add some imports, re to parse the raw response from the LLM, which will be text.
 # regex because we wont use function calling, so we wont get JSON file, but receive the llm's
 # raw response, and need to aprse form tet what function to be called.
 import re
 
-# inspect to get metadata on the functions that we will use as tools to use in llm and propagate
-import inspect
+import ollama
+from langsmith import traceable
 
 MAX_ITERATIONS = 10
 MODEL = "qwen3:1.7b"

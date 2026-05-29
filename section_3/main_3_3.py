@@ -8,7 +8,6 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field
 
 # Pydantic is a library for defining structured data schemas. Instead of the agent returning a messy
 # string, you can force it to return a proper object with specific fields.

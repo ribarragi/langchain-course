@@ -1,17 +1,18 @@
 import os
+
 from dotenv import load_dotenv
 
 # import txt loader
 from langchain_community.document_loaders import TextLoader
-
-# import text splitter
-from langchain_text_splitters import CharacterTextSplitter
 
 # import embeddings object
 from langchain_openai import OpenAIEmbeddings
 
 # import pinecone
 from langchain_pinecone import PineconeVectorStore
+
+# import text splitter
+from langchain_text_splitters import CharacterTextSplitter
 
 load_dotenv()
 # Ingestion: take the data and load it into langchain doc object, split doc into

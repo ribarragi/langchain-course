@@ -1,16 +1,17 @@
 # from _typeshed import OpenBinaryMode
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
 
 # load_dotenv()
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 
-# must import this now:
-from langsmith import traceable
-
 # from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 # import ollama python sdk
 import ollama
+
+# must import this now:
+from langsmith import traceable
 
 MAX_ITERATIONS = 10
 MODEL = "qwen3:1.7b"
