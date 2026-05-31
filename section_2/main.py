@@ -4,7 +4,6 @@ import os
 
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
-
 # Chat model and wrapper over the OpenAI API
 from langchain_openai import ChatOpenAI
 

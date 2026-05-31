@@ -8,13 +8,11 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
-
 # Pydantic is a library for defining structured data schemas. Instead of the agent returning a messy
 # string, you can force it to return a proper object with specific fields.
 # Field lets you add a description to each field, which the LLM reads to understand what
 # to put there.
 from pydantic import BaseModel, Field
-
 # add tavily for the internet connection
 from tavily import TavilyClient
 

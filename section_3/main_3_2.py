@@ -7,7 +7,6 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
-
 # add tavily for the internet connection
 from tavily import TavilyClient
 

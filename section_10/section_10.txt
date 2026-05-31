@@ -14,4 +14,13 @@ Topics to cover:
 First need to ingest LC documentation and index it into vector store (embed and put into pinecone)
 Use Tavily to scrape the LC documentation.
 
+logger.py It's a simple utility file for pretty console output.
+plain print() statements become hard to follow. This file lets you write things like:
+ - log_header("Starting ingestion pipeline")
+ - log_success("Chunks stored in Pinecone")
+ - log_error("Failed to connect to vector store")
+
 # Imports and main classes for ingestion phase
+
+
+# Crawl the LC documentationusing tavily
