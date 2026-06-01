@@ -22,5 +22,36 @@ plain print() statements become hard to follow. This file lets you write things 
 
 # Imports and main classes for ingestion phase
 
+The async/await pattern in Python lets you run tasks concurrently without blocking. The normal pattern asyncio.run(main()) is the standard entry point for async programs.
+For this project specifically, the reason it matters is that the documentation helper will likely be doing things like:
+ - Fetching multiple pages of LangChain docs via Tavily (I/O bound — waiting on network)
+ - Embedding chunks and sending them to Pinecone (more I/O)
+ - Streaming LLM responses back to the user
+With regular synchronous code, each of those waits for the previous one to finish. With async, you can kick off multiple fetches or embeddings concurrently and wait for them all together — much faster when ingesting a large documentation site.
+
 
 # Crawl the LC documentationusing tavily
+
+Very intresting using Tavily for scraping, you can give it instructions with natural language. 
+It would be interesting to look at their documentation to understand Tavily better and use it for scraping.
+
+Check ipynb notebooks for this, specially Tavily Demo Tutorial.ipynb:
+Some other tavily tools to use: TavilyMap and TavilyExtract
+Map: to discover and map out the LC documentation and website and URLs that we want to scrape
+Extract: to extract the data of those pages.
+
+Tavily Crawl is very simple: give URl and it scrapes everything in the site map, and can even give it instructions
+in natural language.
+
+However if we want more control, use TavilyMap and TavilyExtract
+A structure for this could be, if we use batch processing for large websites:
+1. Website Discovery (TavilyMap)
+        |-- Input: https://python.langchain.com/
+        |-- Output: List of 200+ documentation URLs
+2. URL Batching
+        |-- Input: 200+ URLs
+        |-- Output: 10+ batches of 20 URLs each, each batch will be an extract request
+3. Content Extraction (TavilyExtract)
+        |-- Input: Batches of URLs
+        |-- Process:  Concurrent extraction from web pages
+        |-- Output: Clean, parsed content

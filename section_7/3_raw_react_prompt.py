@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 # inspect to get metadata on the functions that we will use as tools to use in llm and propagate
 import inspect
+
 # add some imports, re to parse the raw response from the LLM, which will be text.
 # regex because we wont use function calling, so we wont get JSON file, but receive the llm's
 # raw response, and need to aprse form tet what function to be called.

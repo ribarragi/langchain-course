@@ -1,12 +1,16 @@
 import os
 
 from dotenv import load_dotenv
+
 # import txt loader
 from langchain_community.document_loaders import TextLoader
+
 # import embeddings object
 from langchain_openai import OpenAIEmbeddings
+
 # import pinecone
 from langchain_pinecone import PineconeVectorStore
+
 # import text splitter
 from langchain_text_splitters import CharacterTextSplitter
 

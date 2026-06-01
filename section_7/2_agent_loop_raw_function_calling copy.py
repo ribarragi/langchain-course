@@ -9,6 +9,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
 # from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 # import ollama python sdk
 import ollama
+
 # must import this now:
 from langsmith import traceable
 

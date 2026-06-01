@@ -9,20 +9,25 @@ from typing import Any, Dict, List
 
 import certifi
 from dotenv import load_dotenv
+
 # the chroma vector store in case you want to index everything locally, however he uses pinecone a cloud based vector store
 from langchain_chroma import Chroma
+
 # LC helper class to help split the documents
 from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
+
 # represents a text document with associated metadata
 from langchain_core.documents import Document
+
 # use open ai embeddingx
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
+
 # tavily for crwaling and data scraping
 from langchain_tavily import TavilyCrawl, TavilyExtract, TavilyMap
+
 # import from the logger.py file the logging functions to prettify them
-from logger import (Colors, log_error, log_header, log_info, log_success,
-                    log_warning)
+from logger import Colors, log_error, log_header, log_info, log_success, log_warning
 
 load_dotenv()
 
@@ -61,6 +66,34 @@ async def main():
         "TavilyCrawl: starting to crawl documentation from https://python.langchain.com",
         Colors.PURPLE,
     )
+
+    # Crawl the documentation site: we are using a LC tool because its LC Tavily, we want to invoke that, we give the url, max depth,
+    # advanced extraction retrieves more data
+    res = tavily_crawl.invoke(
+        {
+            "url": "https://python.langchain.com/",
+            "max_depth": 5,
+            "extract_depth": "advanced",
+            # can give instructions in natural language, for example this to restrict the scrape to ai agent content only:
+            # "instructions":"content on ai gents"
+        }
+    )
+
+    # Convert Tavily crawl results to LangChain Document objects
+    all_docs = []
+    for tavily_crawl_result_item in res["results"]:
+        log_info(
+            f"TavilyCrawl: Successfully crawled {tavily_crawl_result_item['url']} from documentation site"
+        )
+        all_docs.append(
+            # we are creating a LC document that has the page content (result but raw content) and in metadata a
+            # dictionary with the key source and the url, we can use the metadata to know exactly where the information was retrieved from.
+            Document(
+                page_content=tavily_crawl_result_item["raw_content"],
+                metadata={"source": tavily_crawl_result_item["url"]},
+            )
+        )
+    # So all docs has LC documents with metadata source: URL and page content: content
 
 
 if __name__ == "__main__":
