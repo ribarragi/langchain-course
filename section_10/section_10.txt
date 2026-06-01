@@ -55,3 +55,9 @@ A structure for this could be, if we use batch processing for large websites:
         |-- Input: Batches of URLs
         |-- Process:  Concurrent extraction from web pages
         |-- Output: Clean, parsed content
+
+After the INGESTION part, the scraping we still need to TRANSFORM it and prepare to index it into the Vector store, put into smaller
+chnks, then we need to EMBED it, then we need to STORE it and finally we need to RETRIEVE it
+
+There are multiple chunking methods, he uses semanti, but there are multiple options.
+Some argue RAG may be dead due to long context message windows. This may not be true... specially in regulated environments.
